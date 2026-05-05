@@ -84,7 +84,7 @@ st.write(
 )
 
 # =====================================
-# IDENTIFICACIÓN DEL RESPONDIENTE (SE MANTIENE)
+# IDENTIFICACIÓN DEL RESPONDIENTE
 # =====================================
 st.header("Identificación del respondiente")
 
@@ -105,10 +105,11 @@ if "actividades" not in st.session_state:
     st.session_state.actividades = []
 
 def añadir_actividad():
- 
+    st.session_state.actividades.append({})
+
+# Botón inicial (solo si no hay actividades)
 if len(st.session_state.actividades) == 0:
     st.button("➕ Añadir actividad", on_click=añadir_actividad)
-
 
 # =====================================
 # FORMULARIO POR ACTIVIDAD
@@ -212,20 +213,16 @@ for idx in range(len(st.session_state.actividades)):
             "Fecha": datetime.now().isoformat()
         }
 
-
 # =====================================
-# AÑADIR ACTIVIDAD (TAMBIÉN AL FINAL)
+# BOTÓN AL FINAL PARA AÑADIR ACTIVIDAD
 # =====================================
-
 if len(st.session_state.actividades) > 0:
     st.divider()
     st.button("➕ Añadir otra actividad", on_click=añadir_actividad)
 
-
 # =====================================
 # GUARDAR RESPUESTAS
 # =====================================
-
 st.divider()
 
 if st.button("✅ Enviar respuestas"):
