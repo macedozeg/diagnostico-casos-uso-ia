@@ -211,9 +211,18 @@ for idx in range(len(st.session_state.actividades)):
             "Fecha": datetime.now().isoformat()
         }
 
+
+# =====================================
+# AÑADIR ACTIVIDAD (TAMBIÉN AL FINAL)
+# =====================================
+st.divider()
+
+st.button("➕ Añadir otra actividad (al final)", on_click=añadir_actividad)
+
 # =====================================
 # GUARDAR RESPUESTAS
 # =====================================
+
 st.divider()
 
 if st.button("✅ Enviar respuestas"):
