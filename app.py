@@ -105,9 +105,10 @@ if "actividades" not in st.session_state:
     st.session_state.actividades = []
 
 def añadir_actividad():
-    st.session_state.actividades.append({})
+ 
+if len(st.session_state.actividades) == 0:
+    st.button("➕ Añadir actividad", on_click=añadir_actividad)
 
-st.button("➕ Añadir actividad", on_click=añadir_actividad)
 
 # =====================================
 # FORMULARIO POR ACTIVIDAD
@@ -215,9 +216,11 @@ for idx in range(len(st.session_state.actividades)):
 # =====================================
 # AÑADIR ACTIVIDAD (TAMBIÉN AL FINAL)
 # =====================================
-st.divider()
 
-st.button("➕ Añadir otra actividad (al final)", on_click=añadir_actividad)
+if len(st.session_state.actividades) > 0:
+    st.divider()
+    st.button("➕ Añadir otra actividad", on_click=añadir_actividad)
+
 
 # =====================================
 # GUARDAR RESPUESTAS
