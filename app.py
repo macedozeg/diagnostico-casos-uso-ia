@@ -88,7 +88,7 @@ st.write(
 )
 
 # =====================================
-# IDENTIFICACIÓN DEL RESPONDIENTE
+# IDENTIFICACIÓN
 # =====================================
 st.header("Identificación del respondiente")
 
@@ -96,153 +96,177 @@ nombre = st.text_input("Nombre y apellidos *")
 area = st.text_input("Área / Equipo")
 
 if not nombre:
-    st.warning("Por favor, indica tu nombre para continuar.")
+    st.warning("Por favor, indica tu nombre.")
     st.stop()
 
-st.success("Identificación completada. Continúa con el cuestionario 👇")
+st.success("Identificación completada 👇")
 st.divider()
 
 # =====================================
-# ESTADO DE ACTIVIDADES
+# ESTADO
 # =====================================
 if "actividades" not in st.session_state:
     st.session_state.actividades = []
 
-def añadir_actividad():
+def añadir():
     st.session_state.actividades.append({})
 
-# Botón inicial (solo si no hay actividades)
+# Botón inicial
 if len(st.session_state.actividades) == 0:
-    st.button("➕ Añadir actividad", on_click=añadir_actividad)
+    st.button("➕ Añadir actividad", on_click=añadir)
 
 # =====================================
-# FORMULARIO POR ACTIVIDAD
+# FORMULARIO
 # =====================================
-for idx in range(len(st.session_state.actividades)):
+for i in range(len(st.session_state.actividades)):
 
     with st.container(border=True):
 
-        st.subheader(f"Actividad {idx + 1}")
+        st.subheader(f"Actividad {i+1}")
 
-        actividad_general = st.selectbox(
+        ag = st.selectbox(
             "Actividad general",
             list(ACTIVIDADES.keys()),
-            key=f"ag_{idx}"
+            key=f"ag_{i}"
         )
 
-        actividad_especifica = st.selectbox(
+        ae = st.selectbox(
             "Actividad específica",
-            ACTIVIDADES[actividad_general],
-            key=f"ae_{idx}"
+            ACTIVIDADES[ag],
+            key=f"ae_{i}"
         )
 
-        repetitividad = st.selectbox(
-            "¿Es una actividad repetitiva?",
+        rep = st.selectbox(
+            "Repetitividad",
             ["Bajo", "Medio", "Alto"],
-            key=f"rep_{idx}"
+            key=f"rep_{i}"
         )
 
         tiempo = st.selectbox(
-            "¿Consume mucho tiempo?",
+            "Consumo de tiempo",
             ["Bajo", "Medio", "Alto"],
-            key=f"time_{idx}"
+            key=f"time_{i}"
         )
 
-        beneficio_ia = st.selectbox(
-            "¿Esta actividad se puede beneficiar del aporte de IA?",
+        beneficio = st.selectbox(
+            "¿Puede beneficiarse de IA?",
             ["No", "Sí"],
-            key=f"bia_{idx}"
+            key=f"bia_{i}"
         )
 
-        uso_ia = ""
-        nombre_ia = ""
+        uso = ""
+        herramienta = ""
+        licencia = ""
+        coste = 0
+        mejoras = ""
         plazo = ""
         riesgos = []
 
-        if beneficio_ia == "Sí":
+        if beneficio == "Sí":
 
-            uso_ia = st.selectbox(
-                "¿Atiende parte de esta actividad con IA?",
+            uso = st.selectbox(
+                "Uso actual de IA",
                 ["No", "Parcial", "Sí"],
-                key=f"uia_{idx}"
+                key=f"uso_{i}"
             )
 
-            if uso_ia in ["Parcial", "Sí"]:
-                nombre_ia = st.text_input(
-                    "Nombre de la(s) IA(s)",
-                    placeholder="Ej: ChatGPT; Copilot",
-                    key=f"nia_{idx}"
+            if uso in ["Parcial", "Sí"]:
+
+                herramienta = st.text_input(
+                    "IA principal utilizada",
+                    placeholder="Ej: ChatGPT, Copilot",
+                    key=f"herr_{i}"
                 )
 
+                licencia = st.selectbox(
+                    "Licencia",
+                    ["Gratis", "De Pago"],
+                    key=f"lic_{i}"
+                )
+
+                if licencia == "De Pago":
+                    coste = st.number_input(
+                        "Coste anual (€)",
+                        min_value=0,
+                        step=50,
+                        key=f"cost_{i}"
+                    )
+
+            mejoras = st.text_area(
+                "Mejoras esperadas con IA",
+                key=f"mej_{i}"
+            )
+
             plazo = st.selectbox(
-                "Plazo de implantación",
+                "Plazo",
                 [
-                    "Corto Plazo: Con impacto inmediato",
-                    "Mediano Plazo: Se requiere la preparación del equipo",
-                    "Largo Plazo: Se atenderá objetivos estructurales del equipo o de IH"
+                    "Corto Plazo: impacto inmediato",
+                    "Mediano Plazo: requiere preparación",
+                    "Largo Plazo: cambio estructural"
                 ],
-                key=f"plazo_{idx}"
+                key=f"plazo_{i}"
             )
 
             riesgos = st.multiselect(
-                "Riesgos percibidos asociados a la IA",
+                "Riesgos",
                 [
                     "Privacidad",
-                    "Calidad de resultados",
-                    "Pérdida de control o confianza",
-                    "Disponibilidad presupuestaria",
+                    "Calidad",
+                    "Control",
+                    "Presupuesto",
                     "Otro"
                 ],
-                key=f"riesgos_{idx}"
+                key=f"riesgos_{i}"
             )
 
         comentario = st.text_input(
-            "Comentario adicional",
-            key=f"com_{idx}"
+            "Comentario",
+            key=f"com_{i}"
         )
 
-        st.session_state.actividades[idx] = {
+        st.session_state.actividades[i] = {
             "Nombre": nombre,
             "Área": area,
-            "Actividad general": actividad_general,
-            "Actividad específica": actividad_especifica,
-            "Repetitividad": repetitividad,
+            "Actividad general": ag,
+            "Actividad específica": ae,
+            "Repetitividad": rep,
             "Tiempo": tiempo,
-            "Beneficio IA": beneficio_ia,
-            "Uso IA": uso_ia,
-            "IA(s)": nombre_ia,
+            "Beneficio IA": beneficio,
+            "Uso IA": uso,
+            "IA principal": herramienta,
+            "Licencia": licencia,
+            "Coste": coste,
+            "Mejoras": mejoras,
             "Plazo": plazo,
             "Riesgos": "; ".join(riesgos),
             "Comentario": comentario,
             "Fecha": datetime.now().isoformat()
         }
 
-# =====================================
-# BOTÓN AL FINAL PARA AÑADIR ACTIVIDAD
-# =====================================
+# Botón final
 if len(st.session_state.actividades) > 0:
     st.divider()
-    st.button("➕ Añadir otra actividad", on_click=añadir_actividad)
+    st.button("➕ Añadir otra actividad", on_click=añadir)
 
 # =====================================
-# GUARDAR RESPUESTAS
+# GUARDAR
 # =====================================
 st.divider()
 
 if st.button("✅ Enviar respuestas"):
 
     if not st.session_state.actividades:
-        st.warning("Debes añadir al menos una actividad.")
+        st.warning("Añade al menos una actividad")
     else:
-        df_nuevo = pd.DataFrame(st.session_state.actividades)
+        df = pd.DataFrame(st.session_state.actividades)
 
         try:
-            df_existente = pd.read_csv(ARCHIVO_CSV)
-            df_final = pd.concat([df_existente, df_nuevo], ignore_index=True)
-        except FileNotFoundError:
-            df_final = df_nuevo
+            prev = pd.read_csv(ARCHIVO_CSV)
+            df = pd.concat([prev, df])
+        except:
+            pass
 
-        df_final.to_csv(ARCHIVO_CSV, index=False)
+        df.to_csv(ARCHIVO_CSV, index=False)
 
-        st.success("¡Respuestas guardadas correctamente! Muchas gracias.")
+        st.success("✅ Respuestas guardadas")
         st.session_state.actividades = []
