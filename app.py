@@ -2,39 +2,90 @@ import streamlit as st
 from datetime import datetime
 import requests
 
-# ✅ URL de tu Apps Script
+# ==============================
+# CONFIGURACIÓN
+# ==============================
+
 URL_API = "https://script.google.com/macros/s/AKfycbweMR8oum94CxPh2jVERaSgoOhX8iieHuDoB-IM1GDQHBVtct6RMS9OgDoKD9HwaqA/exec"
 
-# ==============================
-# CONFIG
-# ==============================
 st.set_page_config(page_title="Diagnóstico IA", layout="wide")
 
 # ==============================
-# ACTIVIDADES
+# ESTADO
 # ==============================
+
+if "actividades" not in st.session_state:
+    st.session_state.actividades = []
+
+if "enviado" not in st.session_state:
+    st.session_state.enviado = False
+
+# ==============================
+# CATÁLOGO COMPLETO (TUYO)
+# ==============================
+
 ACTIVIDADES = {
     "Procesos administrativos internos": [
         "Gestión de correos electrónicos",
-        "Transcripción y resumen de reuniones",
-        "Bases de datos (Excel)",
-        "Planificación interna",
+        "Transcripción y resumen de reuniones o entrevistas",
+        "Gestión y actualización de bases de datos (Excel)",
+        "Gestión y planificación interna de equipos",
         "Recordatorios",
+        "Hojas de pedidos para gastos",
         "Justificaciones de gastos",
-        "Archivo documentación",
-        "Informes de actividad"
+        "Archivo y recuperación de documentación",
+        "Resúmenes de asistencia a viajes o ferias",
+        "Envío masivo de emails personalizados",
+        "Elaboración de informes de actividad"
     ],
-    "Convocatorias": [
-        "Revisión de bases",
-        "Preparación propuestas",
-        "Búsqueda de información",
-        "Resolución de dudas"
+    "Convocatorias y Licitaciones": [
+        "Revisión y resumen de Bases: Convocatorias y Licitaciones",
+        "Preparación administrativa de propuestas/proyectos",
+        "Búsqueda de información (general / investigación / mercado)",
+        "Resolución de dudas sobre convocatorias, considerando FAQs"
+    ],
+    "Preparación de propuestas y proyectos": [
+        "Elaboración de memoria técnico-económica",
+        "Scouting y detección de resultados de investigación"
+    ],
+    "Gestión contractual y legal": [
+        "Revisión y negociación de acuerdos",
+        "Comparación de versiones de acuerdos",
+        "Búsqueda de marco legislativo"
+    ],
+    "Valoración de resultados de investigación y Transferencia tecnológica comercial": [
+        "Planificación y seguimiento de actividades (TRL)",
+        "Elaboración de Ofertas Tecnológicas",
+        "Búsqueda de socios, networking, identificación de contactos",
+        "Preparación de presentaciones y materiales de difusión (orientadas al mercado)",
+        "Evaluación de resultados",
+        "Planes de promoción de los resultados de investigación",
+        "Gestión del conocimiento de los grupos de investigación"
+    ],
+    "Propiedad intelectual y patentabilidad": [
+        "Revisión de documentos vinculados a Derechos de Propiedad Intelectual",
+        "Estado del arte de Derechos de Propiedad Intelectual vinculada a la tecnología de trabajo o desarrollo"
+    ],
+    "Comunicación y contenido": [
+        "Elaboración y actualización de contenidos web y redes sociales",
+        "Elaboración, revisión, publicación y actualización de Memoria Anual",
+        "Elaboración, revisión, publicación y actualización de Newsletters",
+        "Elaboración, revisión, publicación de Notas de Prensa",
+        "Redacción de correos de difusión",
+        "Generación de materiales gráficos y comerciales",
+        "Preparación de presentaciones",
+        "Preparación de vídeos"
+    ],
+    "Recursos Humanos": [
+        "Identificación o selección del perfil a contratar",
+        "Evaluación de proyectos y candidaturas"
     ]
 }
 
 # ==============================
-# TÍTULO
+# INTERFAZ
 # ==============================
+
 st.title("Diagnóstico de Casos de Uso de IA")
 
 st.markdown("""
@@ -47,34 +98,49 @@ st.markdown("""
 
 📩 Dudas: macedoma@unican.es
 """)
+
+# ==============================
+# BLOQUEO SI YA ENVIADO
+# ==============================
+
+if st.session_state.enviado:
+    st.success("✅ Gracias, el formulario ha sido enviado correctamente.")
+
+    if st.button("🔄 Enviar otro formulario"):
+        st.session_state.enviado = False
+        st.session_state.actividades = []
+
+    st.stop()
+
 # ==============================
 # IDENTIFICACIÓN
 # ==============================
+
 nombre = st.text_input("Nombre *")
-area = st.text_input("Área")
+area = st.text_input("Área / Equipo")
 
 if not nombre:
-    st.warning("Introduce tu nombre")
+    st.warning("Introduce tu nombre para continuar")
     st.stop()
 
-st.divider()
-
 # ==============================
-# SESSION STATE
+# FUNCIONES
 # ==============================
-if "actividades" not in st.session_state:
-    st.session_state.actividades = []
 
 def añadir():
     st.session_state.actividades.append({})
 
+# ==============================
 # BOTÓN INICIAL
+# ==============================
+
 if len(st.session_state.actividades) == 0:
     st.button("➕ Añadir actividad", on_click=añadir)
 
 # ==============================
 # FORMULARIO
 # ==============================
+
 for i in range(len(st.session_state.actividades)):
 
     with st.container(border=True):
@@ -88,7 +154,7 @@ for i in range(len(st.session_state.actividades)):
         tiempo = st.selectbox("Tiempo", ["Bajo", "Medio", "Alto"], key=f"time{i}")
 
         equipo = st.selectbox(
-            "¿Participan varias personas?",
+            "¿Participan varias personas del equipo?",
             ["No", "Sí"],
             key=f"equipo{i}"
         )
@@ -112,23 +178,27 @@ for i in range(len(st.session_state.actividades)):
             uso = st.selectbox("Uso de IA", ["No", "Parcial", "Sí"], key=f"uso{i}")
 
             if uso in ["Parcial", "Sí"]:
-                herramienta = st.text_input("IA principal", key=f"herr{i}")
+                herramienta = st.text_input("IA principal utilizada", key=f"herr{i}")
                 licencia = st.selectbox("Licencia", ["Gratis", "De Pago"], key=f"lic{i}")
 
                 if licencia == "De Pago":
-                    coste = st.number_input("Coste (€)", 0, key=f"cost{i}")
+                    coste = st.number_input("Coste anual (€)", 0, key=f"cost{i}")
 
-            mejoras = st.text_area("Mejoras", key=f"mej{i}")
+            mejoras = st.text_area("Mejoras esperadas con IA", key=f"mej{i}")
 
             implantacion = st.selectbox(
                 "Nivel de implantación",
-                ["Corto plazo", "Medio plazo", "Largo plazo"],
+                [
+                    "Corto plazo: impacto inmediato",
+                    "Medio plazo: requiere preparación",
+                    "Largo plazo: cambio estructural"
+                ],
                 key=f"impl{i}"
             )
 
             riesgos = st.multiselect(
                 "Riesgos",
-                ["Privacidad", "Calidad", "Control", "Presupuesto"],
+                ["Privacidad", "Calidad", "Control", "Presupuesto", "Otro"],
                 key=f"riesgos{i}"
             )
 
@@ -154,14 +224,16 @@ for i in range(len(st.session_state.actividades)):
             "Fecha": datetime.now().isoformat()
         }
 
+# ==============================
 # BOTÓN FINAL
+# ==============================
+
 if len(st.session_state.actividades) > 0:
     st.button("➕ Añadir otra actividad", on_click=añadir)
 
 # ==============================
-# ENVIAR RESPUESTAS
+# ENVÍO
 # ==============================
-st.divider()
 
 if st.button("✅ Enviar respuestas"):
 
@@ -172,8 +244,9 @@ if st.button("✅ Enviar respuestas"):
             for fila in st.session_state.actividades:
                 requests.post(URL_API, json=fila)
 
-            st.success("✅ Respuestas enviadas correctamente")
             st.session_state.actividades = []
+            st.session_state.enviado = True
+            st.rerun()
 
         except Exception as e:
             st.error(f"Error al enviar datos: {e}")
