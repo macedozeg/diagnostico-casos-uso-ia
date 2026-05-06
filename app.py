@@ -1,12 +1,18 @@
 import streamlit as st
-import pandas as pd
 from datetime import datetime
+import requests
 
+# ✅ URL de tu Apps Script
+URL_API = "https://script.google.com/macros/s/AKfycbweMR8oum94CxPh2jVERaSgoOhX8iieHuDoB-IM1GDQHBVtct6RMS9OgDoKD9HwaqA/exec"
+
+# ==============================
 # CONFIG
+# ==============================
 st.set_page_config(page_title="Diagnóstico IA", layout="wide")
-ARCHIVO_CSV = "respuestas_diagnostico_ia.csv"
 
+# ==============================
 # ACTIVIDADES
+# ==============================
 ACTIVIDADES = {
     "Procesos administrativos internos": [
         "Gestión de correos electrónicos",
@@ -23,20 +29,14 @@ ACTIVIDADES = {
         "Preparación propuestas",
         "Búsqueda de información",
         "Resolución de dudas"
-    ],
-    "Proyectos": [
-        "Memoria técnico-económica",
-        "Scouting resultados"
-    ],
-    "Legal": [
-        "Revisión de contratos",
-        "Comparación versiones",
-        "Marco legislativo"
     ]
 }
 
+# ==============================
 # TÍTULO
+# ==============================
 st.title("Diagnóstico de Casos de Uso de IA")
+
 st.markdown("""
 **Instrucciones:**
 
@@ -47,20 +47,21 @@ st.markdown("""
 
 📩 Dudas: macedoma@unican.es
 """)
+# ==============================
 # IDENTIFICACIÓN
-st.header("Identificación")
-
+# ==============================
 nombre = st.text_input("Nombre *")
 area = st.text_input("Área")
 
 if not nombre:
-    st.warning("Introduce tu nombre para continuar")
+    st.warning("Introduce tu nombre")
     st.stop()
 
-st.success("✅ Continúa con las actividades")
 st.divider()
 
-# ESTADO
+# ==============================
+# SESSION STATE
+# ==============================
 if "actividades" not in st.session_state:
     st.session_state.actividades = []
 
@@ -71,7 +72,9 @@ def añadir():
 if len(st.session_state.actividades) == 0:
     st.button("➕ Añadir actividad", on_click=añadir)
 
+# ==============================
 # FORMULARIO
+# ==============================
 for i in range(len(st.session_state.actividades)):
 
     with st.container(border=True):
@@ -82,15 +85,19 @@ for i in range(len(st.session_state.actividades)):
         ae = st.selectbox("Actividad específica", ACTIVIDADES[ag], key=f"ae{i}")
 
         rep = st.selectbox("Repetitividad", ["Bajo", "Medio", "Alto"], key=f"rep{i}")
-        tiempo = st.selectbox("Consumo de tiempo", ["Bajo", "Medio", "Alto"], key=f"time{i}")
+        tiempo = st.selectbox("Tiempo", ["Bajo", "Medio", "Alto"], key=f"time{i}")
 
         equipo = st.selectbox(
-            "¿Participan varias personas del equipo?",
+            "¿Participan varias personas?",
             ["No", "Sí"],
             key=f"equipo{i}"
         )
 
-        beneficio = st.selectbox("¿Puede beneficiarse de IA?", ["No", "Sí"], key=f"bia{i}")
+        beneficio = st.selectbox(
+            "¿Puede beneficiarse de IA?",
+            ["No", "Sí"],
+            key=f"bia{i}"
+        )
 
         uso = ""
         herramienta = ""
@@ -105,36 +112,23 @@ for i in range(len(st.session_state.actividades)):
             uso = st.selectbox("Uso de IA", ["No", "Parcial", "Sí"], key=f"uso{i}")
 
             if uso in ["Parcial", "Sí"]:
-
-                herramienta = st.text_input(
-                    "IA principal utilizada",
-                    key=f"herr{i}"
-                )
-
-                licencia = st.selectbox(
-                    "Licencia",
-                    ["Gratis", "De Pago"],
-                    key=f"lic{i}"
-                )
+                herramienta = st.text_input("IA principal", key=f"herr{i}")
+                licencia = st.selectbox("Licencia", ["Gratis", "De Pago"], key=f"lic{i}")
 
                 if licencia == "De Pago":
-                    coste = st.number_input("Coste anual (€)", 0, key=f"cost{i}")
+                    coste = st.number_input("Coste (€)", 0, key=f"cost{i}")
 
-            mejoras = st.text_area("Mejoras que aportaría la IA", key=f"mej{i}")
+            mejoras = st.text_area("Mejoras", key=f"mej{i}")
 
             implantacion = st.selectbox(
                 "Nivel de implantación",
-                [
-                    "Corto plazo: impacto inmediato",
-                    "Medio plazo: requiere preparación",
-                    "Largo plazo: transformación estructural"
-                ],
+                ["Corto plazo", "Medio plazo", "Largo plazo"],
                 key=f"impl{i}"
             )
 
             riesgos = st.multiselect(
                 "Riesgos",
-                ["Privacidad", "Calidad", "Control", "Presupuesto", "Otro"],
+                ["Privacidad", "Calidad", "Control", "Presupuesto"],
                 key=f"riesgos{i}"
             )
 
@@ -162,10 +156,11 @@ for i in range(len(st.session_state.actividades)):
 
 # BOTÓN FINAL
 if len(st.session_state.actividades) > 0:
-    st.divider()
     st.button("➕ Añadir otra actividad", on_click=añadir)
 
-# GUARDAR
+# ==============================
+# ENVIAR RESPUESTAS
+# ==============================
 st.divider()
 
 if st.button("✅ Enviar respuestas"):
@@ -173,15 +168,12 @@ if st.button("✅ Enviar respuestas"):
     if not st.session_state.actividades:
         st.warning("Añade al menos una actividad")
     else:
-        df = pd.DataFrame(st.session_state.actividades)
-
         try:
-            prev = pd.read_csv(ARCHIVO_CSV)
-            df = pd.concat([prev, df])
-        except:
-            pass
+            for fila in st.session_state.actividades:
+                requests.post(URL_API, json=fila)
 
-        df.to_csv(ARCHIVO_CSV, index=False)
+            st.success("✅ Respuestas enviadas correctamente")
+            st.session_state.actividades = []
 
-        st.success("✅ Respuestas guardadas correctamente")
-        st.session_state.actividades = []
+        except Exception as e:
+            st.error(f"Error al enviar datos: {e}")
