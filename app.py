@@ -84,6 +84,7 @@ st.write(
     " Primero indícanos tus datos, luego añade todas las actividades (dando click en añadir actividad) que consideres susceptibles del uso de IA." 
     " Al añadir una actividad, primero selecciona la actividad general y según ello elige la actividad específica asociada."
     " Finalmente, luego de añadir todas las actividades que creas conveniente, da click en Enviar respuestas."
+    " En caso de dudas, escribe a Miguel Macedo a macedoma@unican.es."
 )
 
 # =====================================
