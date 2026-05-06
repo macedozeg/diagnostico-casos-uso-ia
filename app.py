@@ -78,14 +78,19 @@ ACTIVIDADES = {
 # ==============================
 st.title("Diagnóstico de Casos de Uso de IA")
 
-st.write(
+
+st.markdown("""
+**Instrucciones:**
+
     "Este cuestionario permite identificar actividades susceptibles de "
     "mejora mediante tecnologías de automatización e inteligencia artificial." 
-    " Primero indícanos tus datos, luego añade todas las actividades (dando click en añadir actividad) que consideres susceptibles del uso de IA." 
+    " Primero indícanos tus datos, luego añade todas las actividades (has click en añadir actividad) que consideres susceptibles del uso de IA." 
     " Al añadir una actividad, primero selecciona la actividad general y según ello elige la actividad específica asociada."
-    " Finalmente, luego de añadir todas las actividades que creas conveniente, da click en Enviar respuestas."
-    " En caso de dudas, escribe a Miguel Macedo a macedoma@unican.es."
-)
+    " Finalmente, luego de añadir todas las actividades que creas conveniente, haz click en Enviar respuestas."
+
+📩 Dudas: macedoma@unican.es
+""")
+
 
 # ==============================
 # IDENTIFICACIÓN
