@@ -80,7 +80,10 @@ st.title("Diagnóstico operativo de Casos de Uso de IA")
 
 st.write(
     "Este cuestionario permite identificar actividades susceptibles de "
-    "mejora mediante tecnologías de automatización e inteligencia artificial."
+    "mejora mediante tecnologías de automatización e inteligencia artificial." 
+    "Primero indícanos tus datos, luego añade todas las actividades (dando click en añadir actividad) que consideres susceptibles del uso de IA." 
+    "Al añadir una actividad, primero selecciona la actividad general y según ello elige la actividad específica asociada."
+    "Finalmente, luego de añadir todas las actividades que creas conveniente, da click en Enviar respuestas."
 )
 
 # =====================================
