@@ -83,8 +83,8 @@ st.markdown("""
 **Instrucciones:**
 
 1) Este cuestionario permite identificar actividades susceptibles de mejora mediante tecnologías de automatización e inteligencia artificial.
-2) Primero indícanos tus datos, luego añade todas las actividades (has click en añadir actividad) que consideres susceptibles del uso de IA.
-3) Al añadir una actividad, primero selecciona la actividad general y según ello elige la actividad específica asociada.
+2) Primero indícanos tus datos, luego añade todas las actividades que consideres susceptibles del uso de IA (has click en añadir actividad) .
+3) Al añadir una actividad, primero selecciona la actividad general y según ello elige la actividad específica asociada. Completa la información solicitada.
 4) Finalmente, luego de añadir todas las actividades que creas conveniente, haz click en Enviar respuestas.
 
 📩 Dudas: macedoma@unican.es
